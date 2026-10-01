@@ -115,17 +115,20 @@ Arquitetura:
     pontual) que qualquer reset limpa, não um defeito físico persistente.
     **Solução prática enquanto estiver em protoboard**: resetar (USB ou
     botão de reset) quando acontecer — o botão é mais rápido.
-  - **Padrão de quando acontece**: as 4 ocorrências foram todas durante a
-    partida (PC sob uso ativo — jogo rodando). Depois que a partida acabou,
-    o script continuou mandando o mesmo heartbeat a cada 60s por mais de
-    1h30 (~32 escritas idênticas) sem nenhum glitch. Isso descarta a
-    hipótese de "ruído que vai se acumulando com o tempo/quantidade de
-    escritas até estourar na próxima atualização" (se fosse isso, teria
-    aparecido em algum dos 32 heartbeats parados) e aponta mais pra ruído
-    elétrico correlacionado com o **PC sob carga/uso ativo** (GPU
-    trabalhando, mais tráfego USB, vibração de teclado/mouse) do que com
-    tempo decorrido puro. Reforça a suspeita de contato de protoboard
-    sensível a vibração, não um problema que piora sozinho com o tempo.
+  - **Padrão de quando acontece (atualizado)**: as 4 ocorrências da primeira
+    sessão de teste foram todas durante partida ativa, o que sugeriu
+    inicialmente correlação com "PC sob carga". Essa teoria enfraqueceu
+    numa segunda partida de teste (mais kills, mais duração, mesmo uso
+    ativo do PC) que passou **inteira sem nenhum glitch**. O que não
+    enfraqueceu: o restart proposital do script (que reinicia o Arduino via
+    DTR) feito no meio dessa segunda partida foi seguido de mais de 1h sem
+    nenhuma ocorrência. Conclusão honesta por enquanto: parece ser um
+    evento elétrico raro e intermitente, não determinístico nem ligado de
+    forma confiável a "tempo parado" ou "jogo ativo" — só sabemos que reset
+    sempre resolve quando acontece, e depois de um reset pode ficar limpo
+    por bastante tempo. Precisa de mais sessões de dados pra identificar um
+    gatilho de verdade (ou aceitar que é só ruído aleatório de protoboard e
+    resolver com solda na versão comercial).
   - Pra versão comercial, isso não pode depender do usuário final
     perceber e replugar manualmente — vale considerar: reset por hardware
     automático (watchdog), conexões soldadas em vez de jumper/protoboard
@@ -152,8 +155,9 @@ Arquitetura:
   `map.phase == "warmup"` em `registrar_kills_gsi` — coberto por 2 testes
   novos (`test_kill_de_aquecimento_nao_conta`,
   `test_partida_de_verdade_comeca_do_zero_depois_do_aquecimento`).
-- Reiniciar o script de propósito **no meio de uma partida real** (hoje só
-  coberto por teste automatizado, não vivenciado ao vivo).
+- ✅ Testado: reiniciar o script de propósito **no meio de uma partida
+  real** (com o jogador morto, aguardando round acabar). Voltou com o
+  valor exato de antes (steam + pendentes), sem perder nem duplicar kill.
 - Confirmar que o `.cfg` do GSI sobrevive a uma atualização do CS2 (Valve
   às vezes reseta arquivos de usuário em `game/csgo/cfg` em updates
   grandes — se sumir, só recriar o arquivo).
@@ -167,7 +171,26 @@ Arquitetura:
 - Nenhum dos dois corrompe dados — só não é uma experiência "plug and
   play" ainda.
 
-## 5. Roadmap para virar produto comercial
+## 5. Próximos passos (retomar depois)
+
+- **Glitch do LCD**: continuar coletando dados em sessões futuras (quando
+  acontece, se acontece, depois de quanto tempo/quantos resets) até dar
+  pra apontar uma causa real ou aceitar que é ruído de protoboard e resolver
+  com solda na versão comercial.
+- **Buracos de robustez** (seção 4): mensagens amigáveis pra porta 3000
+  ocupada e `chave.txt` faltando — pequeno, rápido, ainda não feito.
+- **Decisão de plataforma pra versão comercial**: Cezar levantou que vender
+  "um Uno numa case plástica" é má ideia — parece amador/barato demais pra
+  um produto de decoração. Precisa decidir com calma qual vai ser a
+  plataforma de verdade antes de avançar no comercial: manter Uno+LCD1602
+  só que bem acabado (solda, PCB simples, case decente), migrar pra ESP32
+  (já citado no roadmap abaixo — elimina a dependência do PC, mais
+  "produto" de verdade), trocar o LCD1602 por um OLED (visual mais premium),
+  etc. Essa decisão de hardware/industrial design deveria vir antes de
+  detalhar o resto do roadmap comercial, já que muda bastante o que faz
+  sentido construir a seguir.
+
+## 6. Roadmap para virar produto comercial
 
 Nada disso é urgente pro trabalho da faculdade — é o que precisaria mudar
 pra vender como produto:
