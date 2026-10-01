@@ -103,14 +103,18 @@ Arquitetura:
      mudando pela tela, confirmando que não é a serial, é o próprio LCD.
   Em todas as vezes o log confirmou que o Python mandou só escritas limpas
   (nunca duplicada/concatenada) — não é bug de lógica.
-  - **Teste decisivo**: no caso 3, desconectar e reconectar o USB (sem
-    mexer em nenhum fio) resolveu completamente — tela voltou limpa. Isso
-    aponta pra um glitch recuperável via reset (power-cycle reinicializa o
-    LCD do zero no `lcd.begin()`), não necessariamente um fio solto — mas
-    como ainda não sabemos a causa raiz, não dá pra descartar fiação
-    marginal (ex. um jumper quase caindo) que só "trava" depois de um
-    reset. **Solução rápida se acontecer nessa versão de protótipo**:
-    desconectar/reconectar o USB do Arduino.
+  - **Teste decisivo (2x)**: desconectar/reconectar o USB resolveu uma vez;
+    numa recorrência posterior, apertar o **botão físico de reset do Uno**
+    (sem tocar em nenhum fio) também resolveu, e o script Python nem
+    percebeu — a porta serial não cai com o reset, só o firmware reinicia,
+    e o próximo heartbeat de 60s já reenviou o valor certo sozinho. Dois
+    resets independentes, dois tipos diferentes (power-cycle via USB e
+    reset de firmware), nenhum envolvendo mexer em fio, e os dois
+    resolveram. Isso é evidência razoavelmente forte de que **não é fio
+    solto** — é corrupção de estado no controlador do LCD (ou ruído
+    pontual) que qualquer reset limpa, não um defeito físico persistente.
+    **Solução prática enquanto estiver em protoboard**: resetar (USB ou
+    botão de reset) quando acontecer — o botão é mais rápido.
   - Pra versão comercial, isso não pode depender do usuário final
     perceber e replugar manualmente — vale considerar: reset por hardware
     automático (watchdog), conexões soldadas em vez de jumper/protoboard
