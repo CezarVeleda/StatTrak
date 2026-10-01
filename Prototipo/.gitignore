@@ -1,0 +1,4 @@
+chave.txt
+state.json
+__pycache__/
+*.pyc
