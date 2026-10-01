@@ -127,8 +127,16 @@ Arquitetura:
 
 ## 3. Testes manuais ainda pendentes
 
-- Jogar **Premier** (ou outro modo) só pra registrar no log o `map.mode`
-  exato reportado, e então decidir se/como adicionar em `MODOS_CONTADOS`.
+- ✅ Testado: **Premier** reporta `map.mode=competitive` igual ao
+  competitive normal — já cai em `MODOS_CONTADOS` sem precisar de ajuste.
+- ✅ Encontrado e corrigido ao vivo: **kills de aquecimento estavam sendo
+  contados** (`match_stats.kills` do GSI inclui aquecimento). Como a Steam
+  não conta esses kills oficialmente, isso inflava `pendentes` de forma
+  permanente (só seria corrigido pela rede de segurança dos 30 min, não
+  pela matemática normal de sincronização). Corrigido filtrando por
+  `map.phase == "warmup"` em `registrar_kills_gsi` — coberto por 2 testes
+  novos (`test_kill_de_aquecimento_nao_conta`,
+  `test_partida_de_verdade_comeca_do_zero_depois_do_aquecimento`).
 - Reiniciar o script de propósito **no meio de uma partida real** (hoje só
   coberto por teste automatizado, não vivenciado ao vivo).
 - Confirmar que o `.cfg` do GSI sobrevive a uma atualização do CS2 (Valve

@@ -74,9 +74,12 @@ class Estado:
     fim_partida_ts: float = None  # quando map.mode foi visto virando None (fim de partida)
 
 
-def registrar_kills_gsi(estado, kills, modo, agora):
+def registrar_kills_gsi(estado, kills, modo, agora, fase=None):
     """Atualiza pendentes a partir de um kill count vindo do GSI."""
     if modo not in MODOS_CONTADOS:
+        return
+    if fase == "warmup":
+        # kill de aquecimento: a Steam nao conta isso no total_kills oficial
         return
     if kills >= estado.ultimo_kills_partida:
         delta = kills - estado.ultimo_kills_partida
@@ -154,6 +157,7 @@ def processar_payload_gsi(estado, payload, agora):
     player = payload.get("player") or {}
     mapa = payload.get("map") or {}
     modo = mapa.get("mode")
+    fase_gsi = mapa.get("phase")  # ex: "warmup", "live", "intermission", "gameover"
 
     atualizar_fase_partida(estado, modo, agora)
 
@@ -168,7 +172,7 @@ def processar_payload_gsi(estado, payload, agora):
     if kills is None:
         return modo
 
-    registrar_kills_gsi(estado, kills, modo, agora)
+    registrar_kills_gsi(estado, kills, modo, agora, fase_gsi)
     return modo
 
 

@@ -27,6 +27,17 @@ class TestPendentes(unittest.TestCase):
         self.assertEqual(self.estado.pendentes, 0)
         self.assertEqual(self.estado.ultimo_kills_partida, 0)
 
+    def test_kill_de_aquecimento_nao_conta(self):
+        tk.registrar_kills_gsi(self.estado, 2, "competitive", agora=1001.0, fase="warmup")
+        self.assertEqual(self.estado.pendentes, 0)
+        self.assertEqual(self.estado.ultimo_kills_partida, 0)
+
+    def test_partida_de_verdade_comeca_do_zero_depois_do_aquecimento(self):
+        tk.registrar_kills_gsi(self.estado, 3, "competitive", agora=1001.0, fase="warmup")
+        tk.registrar_kills_gsi(self.estado, 0, "competitive", agora=1002.0, fase="live")
+        tk.registrar_kills_gsi(self.estado, 1, "competitive", agora=1003.0, fase="live")
+        self.assertEqual(self.estado.pendentes, 1)
+
     def test_reducao_quando_steam_atualiza(self):
         self.estado.pendentes = 4
         tk.aplicar_atualizacao_steam(self.estado, novo_total=102, agora=2000.0)
