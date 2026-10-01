@@ -115,6 +115,17 @@ Arquitetura:
     pontual) que qualquer reset limpa, não um defeito físico persistente.
     **Solução prática enquanto estiver em protoboard**: resetar (USB ou
     botão de reset) quando acontecer — o botão é mais rápido.
+  - **Padrão de quando acontece**: as 4 ocorrências foram todas durante a
+    partida (PC sob uso ativo — jogo rodando). Depois que a partida acabou,
+    o script continuou mandando o mesmo heartbeat a cada 60s por mais de
+    1h30 (~32 escritas idênticas) sem nenhum glitch. Isso descarta a
+    hipótese de "ruído que vai se acumulando com o tempo/quantidade de
+    escritas até estourar na próxima atualização" (se fosse isso, teria
+    aparecido em algum dos 32 heartbeats parados) e aponta mais pra ruído
+    elétrico correlacionado com o **PC sob carga/uso ativo** (GPU
+    trabalhando, mais tráfego USB, vibração de teclado/mouse) do que com
+    tempo decorrido puro. Reforça a suspeita de contato de protoboard
+    sensível a vibração, não um problema que piora sozinho com o tempo.
   - Pra versão comercial, isso não pode depender do usuário final
     perceber e replugar manualmente — vale considerar: reset por hardware
     automático (watchdog), conexões soldadas em vez de jumper/protoboard
